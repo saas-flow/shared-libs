@@ -1,7 +1,7 @@
 package kafka
 
 import (
-	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"go.uber.org/fx"
 )
 
