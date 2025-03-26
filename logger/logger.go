@@ -29,8 +29,18 @@ type Config struct {
 
 func New(config Config) (log *zap.Logger) {
 
+	var filepath string
+	if config.LogPath != "" {
+		filepath = fmt.Sprintf("%s", config.LogPath)
+	}
+
+	var filename string = "combine.log"
+	if config.LogFilename != "" {
+		filename = config.LogFilename
+	}
+
 	rollingFile := &lumberjack.Logger{
-		Filename:   fmt.Sprintf("%s/%s", config.LogPath, config.LogFilename),
+		Filename:   fmt.Sprintf("%s/%s", filepath, filename),
 		MaxSize:    config.LogMaxSize,
 		MaxBackups: config.LogMaxBackup,
 		MaxAge:     config.LogMaxAge,
