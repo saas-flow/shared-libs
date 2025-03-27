@@ -1,8 +1,15 @@
 package response
 
 import (
-	"github.com/gin-gonic/gin"
+	"encoding/json"
 )
+
+type Error interface {
+	Error() string
+}
+
+var _ Error = new(ErrorResponse)
+var _ error = new(ErrorResponse)
 
 // ErrorDetail untuk error spesifik dalam request
 type ErrorDetail struct {
@@ -10,20 +17,22 @@ type ErrorDetail struct {
 	Message string `json:"message"`
 }
 
-// ErrorResponse adalah format standar error response
 type ErrorResponse struct {
 	Code    string        `json:"code"`
 	Message string        `json:"message"`
 	Details []ErrorDetail `json:"details,omitempty"`
 }
 
+func (e *ErrorResponse) Error() string {
+	b, _ := json.Marshal(e)
+	return string(b)
+}
+
 // SendError mengirimkan response error dengan format standar
-func SendError(c *gin.Context, httpStatus int, code, message string, details []ErrorDetail) {
-	c.JSON(httpStatus, gin.H{
-		"error": ErrorResponse{
-			Code:    code,
-			Message: message,
-			Details: details,
-		},
-	})
+func SendError(code, message string, details []ErrorDetail) error {
+	return &ErrorResponse{
+		Code:    code,
+		Message: message,
+		Details: details,
+	}
 }
