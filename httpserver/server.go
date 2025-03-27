@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 
@@ -46,9 +47,20 @@ func StartHttpServer(lc fx.Lifecycle, srv *http.Server) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) (err error) {
 			zap.L().Info("starting application")
-			lis, err := tls.Listen("tcp", srv.Addr, srv.TLSConfig)
-			if err != nil {
-				return err
+
+			var lis net.Listener
+			if srv.TLSConfig != nil {
+				lis, err = tls.Listen("tcp", srv.Addr, srv.TLSConfig)
+				if err != nil {
+					zap.L().Fatal("failed tls.Listen", zap.Error(err))
+					return
+				}
+			} else {
+				lis, err = net.Listen("tcp", srv.Addr)
+				if err != nil {
+					zap.L().Fatal("failed net.Listen", zap.Error(err))
+					return
+				}
 			}
 
 			err = srv.Serve(lis)
