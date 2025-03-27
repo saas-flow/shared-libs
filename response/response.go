@@ -29,7 +29,7 @@ func (e *ErrorResponse) Error() string {
 }
 
 // SendError mengirimkan response error dengan format standar
-func SendError(code, message string, details []ErrorDetail) error {
+func SendError(code, message string, details ...ErrorDetail) error {
 	return &ErrorResponse{
 		Code:    code,
 		Message: message,
