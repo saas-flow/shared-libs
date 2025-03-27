@@ -100,7 +100,6 @@ func Logging() gin.HandlerFunc {
 
 		ctx := c.Request.Context()
 		header := c.Request.Header
-		fmt.Printf("header: %v\n", header)
 		carrier := propagation.HeaderCarrier(header)
 
 		propgator := propagation.NewCompositeTextMapPropagator(
@@ -159,6 +158,10 @@ func Logging() gin.HandlerFunc {
 		// Tangkap error jika ada
 		if err := c.Errors.Last(); err != nil {
 			fields = append(fields, zap.Any("error", err))
+		}
+
+		if span := trace.SpanContextFromContext(c.Request.Context()); span.IsValid() {
+			c.Header("X-Trace-ID", span.TraceID().String())
 		}
 
 		zap.L().With(fields...).Info("Incoming Request")
